@@ -1,0 +1,39 @@
+
+trigger:
+- main
+
+pool:
+  vmImage: 'ubuntu-latest'
+
+steps:
+# Install Terraform
+- task: TerraformInstaller@1
+  inputs:
+    terraformVersion: 'latest'
+
+
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'new2'
+    backendAzureRmResourceGroupName: 'ap_rg1'
+    backendAzureRmStorageAccountName: 'terraform524'
+    backendAzureRmContainerName: 'container52'
+    backendAzureRmKey: 'terraform.tfstate'
+  
+# Apply Terraform configuration
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    environmentServiceNameAzureRM: 'new2'
+
+
+# Publish the Terraform artifact
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Pipeline.Workspace)'
+    artifact: 'capstone11art'
+    publishLocation: 'pipeline'
+  
