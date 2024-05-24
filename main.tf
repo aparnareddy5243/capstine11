@@ -18,16 +18,16 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "appu_aks_rg" {
-  name     = "appu_aks_rg"
+resource "azurerm_resource_group" "appu_aks_rg11" {
+  name     = "appu_aks_rg1"
   location = "UK South"
 }
 
-resource "azurerm_kubernetes_cluster" "appu_aks" {
-  name                = "appu_aks"
+resource "azurerm_kubernetes_cluster" "appu_aks11" {
+  name                = "appu_aks1"
   location            = azurerm_resource_group.appu_aks_rg.location
   resource_group_name = azurerm_resource_group.appu_aks_rg.name
-  dns_prefix          = "appu-aks"
+  dns_prefix          = "appu-aks111"
 
   default_node_pool {
     name       = "appupool"
@@ -40,8 +40,8 @@ resource "azurerm_kubernetes_cluster" "appu_aks" {
   }
 }
 
-resource "azurerm_kubernetes_cluster_node_pool" "appu" {
-  name                  = "appu"
+resource "azurerm_kubernetes_cluster_node_pool" "appu11" {
+  name                  = "appu11"
   kubernetes_cluster_id = azurerm_kubernetes_cluster.appu_aks.id
   vm_size               = "Standard_DS2_v2"
   node_count            = 1
