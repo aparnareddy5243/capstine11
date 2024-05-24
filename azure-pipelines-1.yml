@@ -1,43 +1,44 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
 
 trigger:
 - main
 
 pool:
-  vmImage: ubuntu-latest
+  vmImage: 'ubuntu-latest'
 
 steps:
-- task: DownloadPipelineArtifact@2
-  inputs:
-    artifactName: 'terraform-artifact'
-    path: '$(Pipeline.Workspace)'
-
+# Install Terraform
 - task: TerraformInstaller@1
   inputs:
     terraformVersion: 'latest'
 
-- task: PublishPipelineArtifact@1
-  inputs:
-    artifactName: 'terraform-artifact'
-    targetPath: '$(System.DefaultWorkingDirectory)'
-
+# Initialize Terraform
 - task: TerraformTaskV4@4
   inputs:
     provider: 'azurerm'
     command: 'init'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/main.tf'
+    workingDirectory: '$(Pipeline.Workspace)'
     backendServiceArm: 'new2'
     backendAzureRmResourceGroupName: 'ap_rg1'
     backendAzureRmStorageAccountName: 'terraform524'
     backendAzureRmContainerName: 'container52'
     backendAzureRmKey: 'terraform.tfstate'
 
+# Apply Terraform configuration
 - task: TerraformTaskV4@4
   inputs:
     provider: 'azurerm'
     command: 'apply'
-    workingDirectory: '$(System.DefaultWorkingDirectory)/main.tf'
+    workingDirectory: '$(Pipeline.Workspace)'
     environmentServiceNameAzureRM: 'new2'
+
+# Publish the Terraform artifact
+- task: PublishPipelineArtifact@1
+  inputs:
+    artifactName: 'terraform-artifact'
+    targetPath: '$(System.DefaultWorkingDirectory)'
+
+# Download the Terraform artifact
+- task: DownloadPipelineArtifact@2
+  inputs:
+    artifactName: 'terraform-artifact'
+    targetPath: '$(Pipeline.Workspace)'
