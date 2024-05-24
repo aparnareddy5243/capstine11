@@ -18,7 +18,7 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "appu_aks_rg1" {
+resource "azurerm_resource_group" "appu_aks_rg11" {
   name     = "appu_aks_rg1"
   location = "UK South"
 }
