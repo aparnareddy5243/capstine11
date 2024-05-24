@@ -18,15 +18,15 @@ provider "azurerm" {
   features {}
 }
 
-resource "azurerm_resource_group" "appu_aks_rg11" {
+resource "azurerm_resource_group" "appu_aks_rg1" { # Declaring resource group here
   name     = "appu_aks_rg1"
   location = "UK South"
 }
 
 resource "azurerm_kubernetes_cluster" "appu_aks11" {
   name                = "appu_aks1"
-  location            = azurerm_resource_group.appu_aks_rg1.location
-  resource_group_name = azurerm_resource_group.appu_aks_rg1.name
+  location            = azurerm_resource_group.appu_aks_rg1.location # Referencing the declared resource group
+  resource_group_name = azurerm_resource_group.appu_aks_rg1.name      # Referencing the declared resource group
   dns_prefix          = "appu-aks111"
 
   default_node_pool {
