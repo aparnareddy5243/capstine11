@@ -1,39 +1,46 @@
-# Docker
-# Build and push an image to Azure Container Registry
-# https://docs.microsoft.com/azure/devops/pipelines/languages/docker
-
 trigger:
 - main
 
-resources:
-- repo: self
+pool:
+  vmImage: 'ubuntu-latest'
 
-variables:
-  # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: 'd45db3dd-872e-40a2-9db5-e90d392d3783'
-  imageRepository: 'aparnareddycapstine'
-  containerRegistry: 'new2continerregistry.azurecr.io'
-  dockerfilePath: '$(Build.SourcesDirectory)/GreetingWebApp/Dockerfile'
-  tag: '$(Build.BuildId)'
+steps:
+# Install Terraform
+- task: TerraformInstaller@0
+  inputs:
+    terraformVersion: 'latest'
 
-  # Agent VM image name
-  vmImageName: 'ubuntu-latest'
+# Initialize Terraform
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'init'
+    backendServiceArm: 'new2'
+    backendAzureRmResourceGroupName: 'ap_rg1'
+    backendAzureRmStorageAccountName: 'terraform524'
+    backendAzureRmContainerName: 'container52'
+    backendAzureRmKey: 'terraform.tfstate'
+  
+# Apply Terraform configuration
+- task: TerraformTaskV4@4
+  inputs:
+    provider: 'azurerm'
+    command: 'apply'
+    environmentServiceNameAzureRM: 'new2'
+    commandOptions: '-auto-approve'
 
-stages:
-- stage: Build
-  displayName: Build and push stage
-  jobs:
-  - job: Build
-    displayName: Build
-    pool:
-      vmImage: $(vmImageName)
-    steps:
-    - task: Docker@2
-      displayName: Build and push an image to container registry
-      inputs:
-        command: buildAndPush
-        repository: $(imageRepository)
-        dockerfile: $(dockerfilePath)
-        containerRegistry: $(dockerRegistryServiceConnection)
-        tags: |
-          $(tag)
+# Zip Terraform artifacts
+- task: ArchiveFiles@2
+  inputs:
+    rootFolderOrFile: '$(System.DefaultWorkingDirectory)'
+    includeRootFolder: false
+    archiveType: 'zip'
+    archiveFile: '$(Build.ArtifactStagingDirectory)/terraform_artifact.zip'
+    replaceExistingArchive: true
+
+# Publish the Terraform artifact
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: '$(Build.ArtifactStagingDirectory)/terraform_artifact.zip'
+    artifact: 'capstone11art'
+    publishLocation: 'pipeline'
